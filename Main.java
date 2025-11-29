@@ -3,8 +3,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
 
     static double balance = 0;
@@ -63,9 +61,6 @@ public class Main {
     public static void login(Scanner scan, String[] usernames, String[] passwords, int count) {
         System.out.println("Account Login");
         String user, pass;
-        String cancel = "b";
-        int attempts = 0;
-
 
         while (true) {
             System.out.println("Enter username: ");
@@ -76,106 +71,80 @@ public class Main {
             for (int i = 0; i < count; i++) {
                 if (usernames[i].equals(user) && passwords[i].equals(pass)) {
                     System.out.println("Login successful.");
-                    accountType(scan);
+                    accountType(scan, user);
                     return;
-
                 }
-
             }
-
             System.out.println("Wrong username or password.");
-            attempts++;
-
-            if (attempts >= 3) {
-                System.out.println("Press B to stop or any key to try again");
-                String stop = scan.nextLine();
-                if (stop.equalsIgnoreCase(cancel)) {
-                    System.out.println("Login Cancelled.");
-                    break;
-                }
-                attempts = 0;
-            }
         }
     }
 
-    public static void accountType(Scanner scan) {
+    public static void accountType(Scanner scan, String user) {
         while (true) {
-            try {
-                System.out.println("\nWhat do you want to access?");
-                System.out.println("1 - Deposit");
-                System.out.println("2 - Withdraw");
-                System.out.println("3 - Balance");
-                System.out.println("4 - Logout");
-                System.out.println("5 - Transaction History");
-                System.out.print("Choice: ");
+            System.out.println("\n1 - Deposit");
+            System.out.println("2 - Withdraw");
+            System.out.println("3 - Balance");
+            System.out.println("4 - Logout");
+            System.out.println("5 - Transaction History");
+            System.out.print("Choice: ");
 
-                int choice = scan.nextInt();
-                scan.nextLine();
+            int choice = scan.nextInt();
+            scan.nextLine();
 
-                if (choice == 1) {
-                    System.out.print("Enter deposit amount: ");
-                    double deposit = scan.nextDouble();
-                    scan.nextLine();
-                    balance = balance + deposit;
-                    System.out.println("Deposited: " + deposit);
-                    writeHistory("Deposited: " + deposit);
+            if (choice == 1) {
+                System.out.print("Enter deposit amount: ");
+                double deposit = scan.nextDouble();   scan.nextLine();
+                balance += deposit;
+                System.out.println("Deposited: " + deposit);
+                writeHistory(user, "Deposited: " + deposit);
 
-                } else if (choice == 2) {
-                    System.out.print("Enter withdraw amount: ");
-                    double withdraw = scan.nextDouble();
-                    scan.nextLine();
+            } else if (choice == 2) {
+                System.out.print("Enter withdraw amount: ");
+                double withdraw = scan.nextDouble();   scan.nextLine();
 
-                    if (withdraw > balance) {
-                        System.out.println("Insufficient balance.");
-                    } else {
-                        balance = balance - withdraw;
-                        System.out.println("Withdrew: " + withdraw);
-                        writeHistory("Withdrew: " + withdraw);
-                    }
-
-                } else if (choice == 3) {
-                    System.out.println("Current Balance: " + balance);
-                    writeHistory("Balance: " + balance);
-
-                } else if (choice == 4) {
-                    System.out.println("Logged out.");
-                    break;
-                } else if (choice == 5) {
-                    readFile(scan);
+                if (withdraw > balance) System.out.println("Insufficient balance.");
+                else {
+                    balance -= withdraw;
+                    System.out.println("Withdrew: " + withdraw);
+                    writeHistory(user, "Withdrew: " + withdraw);
                 }
-            } catch (Exception e) {
-                System.out.println("Invalid input.");
-                scan.nextLine();
-            }
 
+            } else if (choice == 3) {
+                System.out.println("Current Balance: " + balance);
+                writeHistory(user, "Balance checked: " + balance);
+
+            } else if (choice == 4) {
+                System.out.println("Logged out.");
+                break;
+
+            } else if (choice == 5) {
+                readFile(user);
+            }
         }
     }
 
-    public static void writeHistory(String text) {
+    public static void writeHistory(String user, String text) {
         try {
-            FileWriter writer = new FileWriter("TransactionHistory.txt", true);
-            writer.write(text + "\n");
+            FileWriter writer = new FileWriter(user + "_History.txt", true);
+            writer.write(user + " - " + text + "\n");   // ← username now shown
             writer.close();
         } catch (IOException e) {
             System.out.println("Error writing history.");
         }
     }
-    public static void readFile(Scanner scan) {
-        try {
-            File file = new File("TransactionHistory.txt");
 
+    public static void readFile(String user) {
+        try {
+            File file = new File(user + "_History.txt");
             if (!file.exists()) {
                 System.out.println("No transaction history yet.");
                 return;
             }
 
             Scanner reader = new Scanner(file);
-            System.out.println("\n Transaction History ");
+            System.out.println("\nTransaction History");
 
-            while (reader.hasNextLine()) {
-                System.out.println(reader.nextLine());
-            }
-
+            while (reader.hasNextLine()) System.out.println(reader.nextLine());
             reader.close();
 
         } catch (Exception e) {
