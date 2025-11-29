@@ -126,7 +126,7 @@ public class Main {
     public static void writeHistory(String user, String text) {
         try {
             FileWriter writer = new FileWriter(user + "_History.txt", true);
-            writer.write(user + " - " + text + "\n");   // ← username now shown
+            writer.write(user + " - " + text + "\n");  
             writer.close();
         } catch (IOException e) {
             System.out.println("Error writing history.");
